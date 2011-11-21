@@ -27,5 +27,5 @@
             button.attachEvent('onclick', demo);
         }
 
-    })
+    });
 })(typeof require != 'undefined' ? require : function(deps, factory) { factory();});

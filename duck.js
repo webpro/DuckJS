@@ -31,7 +31,7 @@
 
                 // Only here we inject the HTML, to be sure the CSS is in as well (to prevent from FOUC)
                 if(resolvedPromises['content'] && parameters.contentAppend) {
-                    var request = resolvedPromises['content']
+                    var request = resolvedPromises['content'];
                     parameters.contentAppend.innerHTML = request.responseText;
                 }
 
@@ -97,7 +97,7 @@
                     script.onload = script.onreadystatechange = null;
 
                 }
-            }
+            };
 
             var a = document.getElementsByTagName('script')[0];
             a.parentNode.insertBefore(script, a);
@@ -124,7 +124,7 @@
 
                 stylesheet.onload = function () {
                     _finish(future, stylesheet);
-                }
+                };
 
             } else {
 
@@ -199,7 +199,7 @@
             loadScript: loadScript
         };
 
-    })
+    });
 })(typeof define != 'undefined'
     // use define for AMD if available
     ? define

@@ -8,6 +8,6 @@ var MyModule = function() {
 
     return {
         init: init
-    }
+    };
 
 }();
