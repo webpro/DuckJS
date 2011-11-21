@@ -29,11 +29,11 @@ It is also possible to load either content, CSS, or script directly/separately:
 
 * Fast & small (under 1K when minified/gzipped)
 * Simple API
-* Support for CommonJS and AMD
-* No dependencies
-* Support for IE7+
 * Parses CSS before HTML is inserted (to prevent from FOUC)
 * Execute module script asynchronously (and callback function at the end)
+* Support for IE7+
+* Support for CommonJS and AMD
+* No dependencies
 * Comes with a simple future/promises API for free
 
 ## Bonus future/promises API
@@ -49,6 +49,8 @@ It is also possible to load either content, CSS, or script directly/separately:
     future.addPromise(asyncFunction2(future));
 
     asyncFunction1 = function(future) {
+
+        promise = "arbitrary object or just a string";
 
         setTimeout(function(){
             future.resolve(promise); // when promise is resolved
