@@ -31,7 +31,7 @@
 
                 // Only here we inject the HTML, to be sure the CSS is in as well (to prevent from FOUC)
                 if(resolvedPromises['content'] && parameters.contentAppend) {
-                    request = resolvedPromises['content']
+                    var request = resolvedPromises['content']
                     parameters.contentAppend.innerHTML = request.responseText;
                 }
 
