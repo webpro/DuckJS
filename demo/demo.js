@@ -9,10 +9,10 @@
         var demo = function() {
 
             Duck.load({
-                content: 'module.html',
+                content: '../demo/module.html',
                 contentAppend: document.getElementById('modulePlaceholder'),
-                css: 'module.css',
-                script: 'module.js',
+                css: '../demo/module.css',
+                script: '../demo/module.js',
                 callback: function(params, promises) {
                     document.getElementById('moduleContent').innerHTML += ' <em>script callback</em>';
                     MyModule.init();
