@@ -21,10 +21,13 @@ var test = function() {
     tests.push(assert(pl, '10px'));
 
     // Callback executed?
-    tests.push(assert(mc.textContent.indexOf('script callback'), 15));
+    var text = mc.textContent || mc.innerText;
+    tests.push(assert(text.indexOf('script callback'), 15));
 
+    var result;
     for(var i = 0, l = tests.length; i < l; i++) {
-        console.log("Test " + (i+1) + (tests[i] ? " passed" : " failed"));
+        result = "Test " + (i+1) + (tests[i] ? " passed" : " failed");
+        console && typeof console.log === 'function' ? console.log(result) : document.body.innerHTML += '<p>'+result+'</p>';
     };
 
 };
