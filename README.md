@@ -1,8 +1,10 @@
-# Duck
+# DuckJS
 
 ## Motivation
 
 There are not a lot of solutions (if at all) to lazy-load complete modules (i.e. HTML, CSS _and_ Javascript) in a simple and straightforward manner.
+
+Often do I identify the need to fetch only a minimum of resources on page load, in order to optimize perceived performance. All resources that are not required immediately should then be lazy loaded on demand. This tiny library provides the means to do just that.
 
 ## API
 
@@ -63,6 +65,8 @@ NB This is not a [CommonJS Promises/A](http://wiki.commonjs.org/wiki/Promises/A)
 
 ## Credits
 
+Many thanks to [Spil Games](http://www.spilgames.com) for allowing me to open source this and develop it further during working hours.
+
 Lots of thanks go to the inspiritational likes of:
 
 * Alex Sexton & Ralph Holzmann (http://yepnopejs.com)
@@ -72,4 +76,4 @@ Lots of thanks go to the inspiritational likes of:
 
 ## Why "duck"?
 
-All my projects are named after animal species. This one is called after ducks, referring to "dive below the surface" and grab something (i.e. the resources for a module).
+All my projects are named after animal species. DuckJS is referring to "dive below the surface" and grab something (i.e. the resources for a module).
