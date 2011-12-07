@@ -23,9 +23,22 @@
 
             var future = new Future();
 
-            parameters.css && future.addPromise(loadStylesheet(parameters.css, future));
-            parameters.content && future.addPromise(loadContent(parameters.content, future));
-            parameters.script && future.addPromise(loadScript(parameters.script, future));
+			var resourceTypes = ['css', 'content', 'script'], i, j, il = resourceTypes.length, jl, t, url, fLoad;
+
+			for(i = 0; i < il; i++) {
+				t = resourceTypes[i];
+				url = parameters[t];
+				if(url) {
+					fLoad = 'load' + t.charAt(0).toUpperCase() + t.slice(1); // E.g. "load" + "script" becomes "loadScript()"
+					if(typeof url === 'string') {
+						future.addPromise(this[fLoad].call(this, url, future));
+					} else if (url.length) {
+						for(j = 0, jl = url.length; j < jl; j++) {
+							future.addPromise(this[fLoad].call(this, url[j], future));
+						}
+					}
+				}
+			}
 
             future.then(function(resolvedPromises) {
 
@@ -113,7 +126,7 @@
          * @param [future] Either a Future object, or a callback function.
          */
 
-        var loadStylesheet = function(url, future) {
+        var loadCss = function(url, future) {
 
             var stylesheet = document.createElement('link');
             stylesheet.rel = 'stylesheet';
@@ -195,7 +208,7 @@
         return {
             load: load,
             loadContent: loadContent,
-            loadStylesheet: loadStylesheet,
+            loadCss: loadCss,
             loadScript: loadScript
         };
 

@@ -11,7 +11,7 @@
             Duck.load({
                 content: '../demo/module.html',
                 contentAppend: document.getElementById('modulePlaceholder'),
-                css: '../demo/module.css',
+                css: ['../demo/module.css', '../demo/module2.css'],
                 script: '../demo/module.js',
                 callback: function(params, promises) {
                     document.getElementById('moduleContent').innerHTML += ' <em>script callback</em>';

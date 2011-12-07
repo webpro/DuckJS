@@ -26,6 +26,14 @@ It is also possible to load either content, CSS, or script directly/separately:
 
     Duck.loadScript('module.js', callback);
 
+Additionally, an array can be provided to load multiple CSS or script resources, e.g.:
+
+    Duck.load({
+        content: 'module.html',
+        contentAppend: document.getElementById('modulePlaceholder'),
+        css: ['module.css', 'module-more.css'],
+    });
+
 
 ## Features
 
