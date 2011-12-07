@@ -195,7 +195,7 @@
 
                 } else if(future.innerHTML) {
 
-                    future.innerHTML = this.responseText; // Append to DOM
+                    future.innerHTML = promise.responseText; // Append to DOM
 
                 }
             }
