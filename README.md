@@ -46,6 +46,12 @@ Additionally, an array can be provided to load multiple CSS or script resources,
 * No dependencies
 * Comes with a simple future/promises API for free
 
+## Notes
+
+* HTML content is fetched using XMLHttpRequest, which (apart from a CORS setup) does not support cross-domain requests.
+* Stylesheets and scripts are loaded using their normal ``<link>`` and ``<script>`` elements and can be cross-domain.
+* Any HTML content is simply set using `innerHTML` on the provided `contentAppend` argument property.
+
 ## Bonus future/promises API
 
     var future = new Future();
