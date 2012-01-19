@@ -99,7 +99,7 @@
             var script = document.createElement('script');
             script.type = 'text/javascript';
             script.async = true;
-            script.src = url;
+            script.src = url.match(/\.js$/) ? url : url + '.js';
 
             script.onreadystatechange = script.onload = function () {
 
