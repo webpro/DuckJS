@@ -2,9 +2,13 @@
 
 ## Motivation
 
-There are not a lot of solutions (if at all) to lazy-load complete modules (i.e. HTML, CSS _and_ Javascript) in a simple and straightforward manner.
-
 Often do I identify the need to fetch only a minimum of resources on page load, in order to optimize perceived performance. All resources that are not required immediately should then be lazy loaded on demand. This tiny library provides the means to do just that.
+
+There are not a lot of complete solutions to (lazy) load complete modules (i.e. JavaScript, _and_ CSS, _and_ HTML) in a simple and straightforward manner. Script loaders are common, but they usually support only JavaScript.
+
+## yepnope
+
+Why develop or use DuckJS when there is [yepnope](http://yepnopejs.com)? The popular (and deservedly so!) [yepnope](http://yepnopejs.com) library is a similar solution, but DuckJS has an even simpler API, is much smaller, and supports both CSS and HTML loading by default. On the other hand, DuckJS doesn't have the yep/nope feature tests for conditional resource loading, and also there is no plugin architecture. This is by design, to keep things simple.
 
 ## API
 
@@ -41,8 +45,8 @@ Additionally, an array can be provided to load multiple CSS or script resources,
 * Simple API
 * Parses CSS before HTML is inserted (to prevent from FOUC)
 * Execute module script asynchronously (and callback function at the end)
-* Support for IE7+
-* Support for CommonJS and AMD
+* Supports IE7+
+* Supports AMD
 * No dependencies
 * Comes with a simple future/promises API for free
 
@@ -52,7 +56,7 @@ Additionally, an array can be provided to load multiple CSS or script resources,
 * Stylesheets and scripts are loaded using their normal ``<link>`` and ``<script>`` elements and can be cross-domain.
 * Any HTML content is simply set using `innerHTML` on the provided `contentAppend` argument property.
 
-## Bonus future/promises API
+## Bonus: future/promises API
 
     var future = new Future();
 
@@ -87,7 +91,3 @@ Lots of thanks go to the inspiritational likes of:
 * Stoyan Stefanov (http://www.phpied.com/when-is-a-stylesheet-really-loaded/)
 * John Hann (https://github.com/unscriptable/promises)
 * Brian Cavalier (https://github.com/briancavalier/when.js)
-
-## Why "duck"?
-
-All my projects are named after animal species. DuckJS is referring to "dive below the surface" and grab something (i.e. the resources for a module).
