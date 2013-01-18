@@ -12,16 +12,31 @@
             <p>Module placeholder (will be overwritten)</p>
         </div>
 
+		<script src="../rsvp.js"></script>
         <script src="../duck.min.js"></script>
-        <script src="demo.js"></script>
-
-        <!-- Sample usage with RequireJS -->
-        <!--
-        <script src="../../requirejs/require.js" data-main="demo"></script>
         <script>
-            require.config({baseUrl: ".."});
-        </script>
-        -->
+			var button = document.getElementById('myButton');
 
+			var demo = function() {
+
+				Duck.load({
+					content: '../demo/module.html',
+					contentAppend: document.getElementById('modulePlaceholder'),
+					css: ['../demo/module.css', '../demo/module2.css'],
+					script: '../demo/module.js',
+					callback: function(options) {
+						document.getElementById('moduleContent').innerHTML += ' <em>script callback</em>';
+						MyModule.init();
+					}
+				});
+
+			};
+
+			if(window.addEventListener) {
+				button.addEventListener('click', demo, false);
+			} else if(window.attachEvent) {
+				button.attachEvent('onclick', demo);
+			}
+        </script>
     </body>
 </html>

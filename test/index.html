@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>DuckJS demo page</title>
+        <title>DuckJS test page</title>
     </head>
     <body>
 
@@ -14,17 +14,49 @@
             <p>Module placeholder (will be overwritten)</p>
         </div>
 
-        <script src="../duck.min.js"></script>
+		<script src="../rsvp.min.js"></script>
+        <script src="../duck.js"></script>
         <script src="../demo/demo.js"></script>
-        <script src="test.js"></script>
-
-        <!-- Sample usage with RequireJS -->
-        <!--
-        <script src="../../requirejs/require.js" data-main="demo"></script>
         <script>
-            require.config({baseUrl: ".."});
-        </script>
-        -->
+			var testButton = document.getElementById('myTestButton');
 
+			var assert = function(assertion, value) {
+				return assertion === value;
+			};
+
+			var test = function() {
+
+				var tests = [];
+
+				var mc = document.getElementById('moduleContent');
+
+				// #1: HTML appended to DOM?
+				tests.push(assert(typeof mc, 'object'));
+
+				// #2: Javascript executed?
+				tests.push(assert(document.getElementById('myButton').innerHTML, 'Module loaded'));
+
+				// #3: CSS applied?
+				var pl = mc.currentStyle ? mc.currentStyle.paddingLeft : document.defaultView.getComputedStyle(document.getElementById('moduleContent'),null).getPropertyValue('padding-left');
+				tests.push(assert(pl, '10px'));
+
+				// #4: Callback executed?
+				var text = mc.textContent || mc.innerText;
+				tests.push(assert(text.indexOf('script callback'), 15));
+
+				var result;
+				for(var i = 0, l = tests.length; i < l; i++) {
+					result = "Test " + (i+1) + (tests[i] ? " passed" : " failed");
+					console && typeof console.log === 'function' ? console.log(result) : document.body.innerHTML += '<p>'+result+'</p>';
+				}
+
+			};
+
+			if(window.addEventListener) {
+				testButton.addEventListener('click', test, false);
+			} else if(window.attachEvent) {
+				testButton.attachEvent('onclick', test);
+			}
+        </script>
     </body>
 </html>
