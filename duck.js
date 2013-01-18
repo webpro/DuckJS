@@ -23,18 +23,17 @@
 
 		var promises = [];
 
-		var resourceTypes = ['css', 'content', 'script'], i, j, il = resourceTypes.length, jl, t, url, fLoad;
+		var resourceTypes = ['css', 'content', 'script'], i, j, il = resourceTypes.length, jl, resourceType, url, fLoad;
 
 		for(i = 0; i < il; i++) {
-			t = resourceTypes[i];
-			url = options[t];
+			resourceType = resourceTypes[i];
+			url = options[resourceType];
 			if(url) {
-				fLoad = 'load' + t.charAt(0).toUpperCase() + t.slice(1); // E.g. "load" + "script" becomes "loadScript()"
 				if(typeof url === 'string') {
-					promises.push(this[fLoad].call(this, url));
+					promises.push(_[resourceType].call(this, url));
 				} else if(url.length) {
 					for(j = 0, jl = url.length; j < jl; j++) {
-						promises.push(this[fLoad].call(this, url[j]));
+						promises.push(_[resourceType].call(this, url[j]));
 					}
 				}
 			}
@@ -69,7 +68,7 @@
 	 * @return {Promise}
 	 */
 
-	var loadContent = function(url) {
+	var content = function(url) {
 
 		var promise = new RSVP.Promise(),
 			request = new XMLHttpRequest();
@@ -101,7 +100,7 @@
 	 * @return {Promise}
 	 */
 
-	var loadScript = function(url) {
+	var script = function(url) {
 
 		var promise = new RSVP.Promise();
 
@@ -135,7 +134,7 @@
 	 * @return {Promise}
 	 */
 
-	var loadCss = function(url) {
+	var css = function(url) {
 
 		var promise = new RSVP.Promise();
 
@@ -185,15 +184,18 @@
 
 	};
 
-	/**
-	 * Return public API
-	 */
+	// Private members
+
+	var _ = {
+		content: content,
+		script: script,
+		css: css
+	};
+
+	// Public API
 
 	return {
-		load: load,
-		loadContent: loadContent,
-		loadCss: loadCss,
-		loadScript: loadScript
+		load: load
 	};
 
 }));
