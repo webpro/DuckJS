@@ -47,39 +47,13 @@ Additionally, an array can be provided to load multiple CSS or script resources,
 * Execute module script asynchronously (and callback function at the end)
 * Supports IE7+
 * Supports AMD
-* No dependencies
-* Comes with a simple future/promises API for free
 
 ## Notes
 
 * HTML content is fetched using XMLHttpRequest, which (apart from a CORS setup) does not support cross-domain requests.
 * Stylesheets and scripts are loaded using their normal ``<link>`` and ``<script>`` elements and can be cross-domain.
 * Any HTML content is simply set using `innerHTML` on the provided `contentAppend` argument property.
-
-## Bonus: future/promises API
-
-    var future = new Future();
-
-    future.then(function() {
-        // do when all promises are resolved
-    });
-
-    // Add n number of promises:
-    future.addPromise(asyncFunction1(future));
-    future.addPromise(asyncFunction2(future));
-
-    asyncFunction1 = function(future) {
-
-        promise = "arbitrary object or just a string";
-
-        setTimeout(function(){
-            future.resolve(promise); // when promise is resolved
-        }, 100);
-
-        return promise;
-    };
-
-NB This is not a [CommonJS Promises/A](http://wiki.commonjs.org/wiki/Promises/A) implementation.
+* Duck has a dependency to the small but excellent [RSVP.js](https://github.com/tildeio/rsvp.js) for using promises (to deal with async requests).
 
 ## Credits
 
@@ -89,5 +63,6 @@ Lots of thanks go to the inspiritational likes of:
 
 * Alex Sexton & Ralph Holzmann (http://yepnopejs.com)
 * Stoyan Stefanov (http://www.phpied.com/when-is-a-stylesheet-really-loaded/)
+* Yehuda Katz (https://github.com/tildeio/rsvp.js)
 * John Hann (https://github.com/unscriptable/promises)
 * Brian Cavalier (https://github.com/briancavalier/when.js)
