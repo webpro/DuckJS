@@ -1,216 +1,199 @@
-(function(define) {
+(function(root, factory) {
+	if(typeof define === 'function' && define.amd) {
+		define(['./rsvp.amd'], factory);
+	} else {
+		root.Duck = factory(root.RSVP);
+	}
+}(this, function(RSVP) {
 
-    define(['./future'], function(Future) {
+	var isGecko = ('MozAppearance' in document.documentElement.style);
+	var isWebkit = ('webkitAppearance' in document.documentElement.style);
 
-        Future = Future || window.Future; // Compatibility with non-modular usage
+	/**
+	 * Main method to load all or some of: HTML, CSS, Javascript
+	 *
+	 * @param {string} options.content Url to HTML resource
+	 * @param {object} options.contentAppend DOM node to append HTML to
+	 * @param {string} options.css Url to CSS resource
+	 * @param {string} options.script Url to Javascript resource
+	 * @param {function} options.callback Function to execute when all resources are fetched/parsed/executed
+	 */
 
-        var isGecko = ('MozAppearance' in document.documentElement.style);
-        var isWebkit = ('webkitAppearance' in document.documentElement.style);
+	var load = function(options) {
 
-        /**
-         * Main method to load all or some of: HTML, CSS, Javascript
-         *
-         * @param {string} parameters.content Url to HTML resource
-         * @param {object} parameters.contentAppend DOM node to append HTML to
-         * @param {string} parameters.css Url to CSS resource
-         * @param {string} parameters.script Url to Javascript resource
-         * @param {function} parameters.callback Function to execute when all resources are fetched/parsed/executed
-         */
+		var promises = [];
 
-        var load = function() {
+		var resourceTypes = ['css', 'content', 'script'], i, j, il = resourceTypes.length, jl, t, url, fLoad;
 
-            var parameters = arguments[0];
-
-            var future = new Future();
-
-			var resourceTypes = ['css', 'content', 'script'], i, j, il = resourceTypes.length, jl, t, url, fLoad;
-
-			for(i = 0; i < il; i++) {
-				t = resourceTypes[i];
-				url = parameters[t];
-				if(url) {
-					fLoad = 'load' + t.charAt(0).toUpperCase() + t.slice(1); // E.g. "load" + "script" becomes "loadScript()"
-					if(typeof url === 'string') {
-						future.addPromise(this[fLoad].call(this, url, future));
-					} else if (url.length) {
-						for(j = 0, jl = url.length; j < jl; j++) {
-							future.addPromise(this[fLoad].call(this, url[j], future));
-						}
+		for(i = 0; i < il; i++) {
+			t = resourceTypes[i];
+			url = options[t];
+			if(url) {
+				fLoad = 'load' + t.charAt(0).toUpperCase() + t.slice(1); // E.g. "load" + "script" becomes "loadScript()"
+				if(typeof url === 'string') {
+					promises.push(this[fLoad].call(this, url));
+				} else if(url.length) {
+					for(j = 0, jl = url.length; j < jl; j++) {
+						promises.push(this[fLoad].call(this, url[j]));
 					}
 				}
 			}
+		}
 
-            future.then(function(resolvedPromises) {
+		RSVP.all(promises).then(function(resolvedPromises) {
 
-                // Only here we inject the HTML, to be sure the CSS is in as well (to prevent from FOUC)
-                if(resolvedPromises['content'] && parameters.contentAppend) {
-                    var request = resolvedPromises['content'];
-                    parameters.contentAppend.innerHTML = request.responseText;
-                }
+			var il = resolvedPromises.length,
+				promise;
 
-                // Execute callback, and pass original parameters, and resolved promises
-                if(parameters.callback) {
-                    parameters.callback.apply(null, [parameters, resolvedPromises]);
-                }
-            });
+			// Only here we inject the HTML, to be sure the CSS is in as well (to prevent from FOUC)
+			for(var i = 0; i < il; i++) {
+				promise = resolvedPromises[i];
+				if(typeof promise === 'string') {
+					options.contentAppend.innerHTML = promise;
+				}
+			}
 
-        };
+		}).then(function() {
+			// Execute callback, and pass original parameters
+			if(options.callback) {
+				options.callback(options);
+			}
+		})
 
-        /**
-         * Load and append HTML
-         *
-         * @param {string} url
-         * @param [future] Either a Future object, a DOM node, or a callback function.
-         */
+	};
 
-        var loadContent = function(url, future) {
+	/**
+	 * Load and append HTML
+	 *
+	 * @param {string} url
+	 * @return {Promise}
+	 */
 
-            var request = new XMLHttpRequest();
+	var loadContent = function(url) {
 
-            request.onreadystatechange = function() {
+		var promise = new RSVP.Promise(),
+			request = new XMLHttpRequest();
 
-                if(this.readyState === 4) {
+		request.onreadystatechange = function() {
 
-                    if(this.status >= 200 && this.status < 300 || this.status === 304) {
+			if(this.readyState === 4) {
 
-                        _finish(future, this, 'content');
+				if(this.status >= 200 && this.status < 300 || this.status === 304) {
 
-                    }
-                }
-            };
+					promise.resolve(this.response);
 
-            request.open('GET', url, true);
-            request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            request.send();
+				}
+			}
+		};
 
-            return request;
+		request.open('GET', url, true);
+		request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+		request.send();
 
-        };
+		return promise;
 
-        /**
-         * Load and execute script
-         *
-         * @param {string} url
-         * @param [future] Either a Future object, or a callback function.
-         */
+	};
 
-        var loadScript = function(url, future) {
+	/**
+	 * Load and execute script
+	 *
+	 * @param {string} url
+	 * @return {Promise}
+	 */
 
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.async = true;
-            script.src = url.match(/\.js$/) ? url : url + '.js';
+	var loadScript = function(url) {
 
-            script.onreadystatechange = script.onload = function () {
+		var promise = new RSVP.Promise();
 
-                if(!script.readyState || script.readyState === 'loaded' || script.readyState === 'complete') {
+		var script = document.createElement('script');
+		script.type = 'text/javascript';
+		script.async = true;
+		script.src = url.match(/\.js$/) ? url : url + '.js';
 
-                    _finish(future, script);
+		script.onreadystatechange = script.onload = function() {
 
-                    script.onload = script.onreadystatechange = null;
+			if(!script.readyState || script.readyState === 'loaded' || script.readyState === 'complete') {
 
-                }
-            };
+				promise.resolve(script);
 
-            var a = document.getElementsByTagName('script')[0];
-            a.parentNode.insertBefore(script, a);
+				script.onload = script.onreadystatechange = null;
 
-            return script;
+			}
+		};
 
-        };
+		var a = document.getElementsByTagName('script')[0];
+		a.parentNode.insertBefore(script, a);
 
-        /**
-         * Load and apply stylesheet
-         *
-         * @param {string} url
-         * @param [future] Either a Future object, or a callback function.
-         */
+		return promise;
 
-        var loadCss = function(url, future) {
+	};
 
-            var stylesheet = document.createElement('link');
-            stylesheet.rel = 'stylesheet';
-            stylesheet.type = 'text/css';
-            stylesheet.href = url;
+	/**
+	 * Load and apply stylesheet
+	 *
+	 * @param {string} url
+	 * @return {Promise}
+	 */
 
-            if(!(isWebkit || isGecko)) {
+	var loadCss = function(url) {
 
-                stylesheet.onload = function () {
-                    _finish(future, stylesheet);
-                };
+		var promise = new RSVP.Promise();
 
-            } else {
+		var stylesheet = document.createElement('link');
+		stylesheet.rel = 'stylesheet';
+		stylesheet.type = 'text/css';
+		stylesheet.href = url;
 
-                var done = false;
+		if(!(isWebkit || isGecko)) {
 
-                var poll = function(stylesheet) {
-                    window.setTimeout(function() {
-                        if(!done) {
-                            try {
-                                if(stylesheet.sheet.cssRules.length) {
-                                    done = true;
-                                    _finish(future, stylesheet);
-                                } else {
-                                    poll(stylesheet);
-                                }
-                            } catch(e) {
-                                if((e.code === 1e3) || (e.message === 'security' || e.message === 'denied')) {
-                                    done = true;
-                                    _finish(future, stylesheet);
-                                } else {
-                                    poll(stylesheet);
-                                }
-                            }
-                        }
-                    }, 0);
-                };
-                poll(stylesheet);
-            }
+			stylesheet.onload = function() {
+				promise.resolve(stylesheet);
+			};
 
-            document.getElementsByTagName("head")[0].appendChild(stylesheet);
+		} else {
 
-            return stylesheet;
+			var done = false;
 
-        };
+			var poll = function(stylesheet) {
+				window.setTimeout(function() {
+					if(!done) {
+						try {
+							if(stylesheet.sheet.cssRules.length) {
+								done = true;
+								promise.resolve(stylesheet);
+							} else {
+								poll(stylesheet);
+							}
+						} catch(e) {
+							if((e.code === 1e3) || (e.message === 'security' || e.message === 'denied')) {
+								done = true;
+								// We just resolve (although CSS is not loaded), because we only implemented happy path
+								promise.resolve(stylesheet);
+							} else {
+								poll(stylesheet);
+							}
+						}
+					}
+				}, 0);
+			};
+			poll(stylesheet);
+		}
 
-        /**
-         * Private method to handle either resolved promises and/or callback functions
-         *
-         * @param future Future or callback function
-         * @param promise Resolved promise
-         * @param {string} [label]
-         */
+		document.getElementsByTagName("head")[0].appendChild(stylesheet);
 
-        var _finish = function(future, promise, label) {
+		return promise;
 
-            if(future) {
+	};
 
-                if(future.resolve) {
+	/**
+	 * Return public API
+	 */
 
-                    future.resolve(promise, label); // Resolve a promise
+	return {
+		load: load,
+		loadContent: loadContent,
+		loadCss: loadCss,
+		loadScript: loadScript
+	};
 
-                } else if(typeof future === 'function') {
-
-                    future.call(null, promise); // Execute callback, passing the promise as argument
-
-                } else if(future.innerHTML) {
-
-                    future.innerHTML = promise.responseText; // Append to DOM
-
-                }
-            }
-        };
-
-        /**
-         * Return public API
-         */
-
-        return {
-            load: load,
-            loadContent: loadContent,
-            loadCss: loadCss,
-            loadScript: loadScript
-        };
-
-    });
-})(typeof define != 'undefined' ? define : function(deps, factory) { this.Duck = factory(); });
+}));
